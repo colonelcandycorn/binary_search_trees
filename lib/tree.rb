@@ -15,6 +15,50 @@ class Tree
     root
   end
 
+  def insert(data, root = @root)
+    return Node.new(data) if root.nil?
+
+    if data > root.data
+      root.right = insert(data, root.right)
+    else
+      root.left = insert(data, root.left)
+    end
+
+    root
+  end
+
+  def delete(data, node = @root)
+    return node if node.nil?
+
+    if data > node.data
+      node.right = delete(data, node.right)
+
+    elsif data < node.data
+      node.left = delete(data, node.left)
+
+    else
+
+      if node.left.nil?
+        return node.right
+      elsif node.right.nil?
+        return node.left
+      else
+        temp = min_value(node.right)
+        node.data = temp.data
+        node.right = delete(temp.data, node.right)
+      end
+    end
+    node
+  end
+
+  def min_value(node)
+    current_node = node
+    while current_node.left
+      current_node = current_node.left
+    end
+    current_node
+  end
+
   def pretty_print(node = @root, prefix = '', is_left = true)
     pretty_print(node.right, "#{prefix}#{is_left ? '│   ' : '    '}", false) if node.right
     puts "#{prefix}#{is_left ? '└── ' : '┌── '}#{node.data}"
@@ -22,6 +66,10 @@ class Tree
   end
 end
 
-testarray = Array.new(20) { rand(1..20) }
+testarray = [1,2,3,4,5,6,7,8,9]
 tree = Tree.new(testarray)
+tree.pretty_print
+tree.insert(0)
+tree.pretty_print
+tree.delete(5)
 tree.pretty_print
