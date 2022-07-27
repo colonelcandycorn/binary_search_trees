@@ -88,6 +88,27 @@ class Tree
     block_given? ? array.each { |queue| yield queue[0] } : array
   end
 
+  def inorder(node = @root, stack = [])
+    stack = inorder(node.left, stack) if node.left
+    stack.push(node.data)
+    stack = inorder(node.right, stack) if node.right
+    block_given? ? (stack.each {|data| yield data }) : stack
+  end
+
+  def preorder(node = @root, queue = [])
+    queue.push(node.data)
+    queue = preorder(node.left, queue) if node.left
+    queue = preorder(node.right, queue) if node.right
+    block_given? ? (queue.each {|data| yield data }) : queue
+  end
+
+  def postorder(node = @root, array = [])
+    array = postorder(node.left, array) if node.left
+    array = postorder(node.right, array) if node.right
+    array.push(node.data)
+    block_given? ? (array.each {|data| yield data }) : array
+  end
+
   def pretty_print(node = @root, prefix = '', is_left = true)
     pretty_print(node.right, "#{prefix}#{is_left ? '│   ' : '    '}", false) if node.right
     puts "#{prefix}#{is_left ? '└── ' : '┌── '}#{node.data}"
@@ -109,3 +130,13 @@ array2.each { |array| puts "#{array[0].data}\n" }
 string = ''
 tree.level_order_recursion { |node| string += node.data.to_s }
 puts string
+
+p tree.inorder
+p tree.preorder
+p tree.postorder
+tree.inorder { |data| puts data }
+
+testarray2 = Array.new(500) { rand(1..10000) }
+tree2 = Tree.new(testarray2)
+p tree2.inorder
+tree2.pretty_print
