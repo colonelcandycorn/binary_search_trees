@@ -131,38 +131,28 @@ class Tree
     [depth(node, count + 1, current_node.left), depth(node, count + 1, current_node.right)].max
   end
 
+  def balanced?(node = @root)
+    if node.left && node.right
+      return false if (height(node.right) - height(node.left)).abs > 1
+
+      result = balanced?(node.right) && balanced?(node.left)
+    elsif node.right
+      result = height(node.right).zero?
+    elsif node.left
+      result = height(node.left).zero?
+    else
+      result = true
+    end
+    result
+  end
+
+  def rebalance
+    @root = build_tree(inorder)
+  end
+
   def pretty_print(node = @root, prefix = '', is_left = true)
     pretty_print(node.right, "#{prefix}#{is_left ? '│   ' : '    '}", false) if node.right
     puts "#{prefix}#{is_left ? '└── ' : '┌── '}#{node.data}"
     pretty_print(node.left, "#{prefix}#{is_left ? '    ' : '│   '}", true) if node.left
   end
 end
-
-testarray = [1,2,3,4,5,6,7,8,9]
-tree = Tree.new(testarray)
-tree.pretty_print
-tree.insert(0)
-tree.pretty_print
-tree.delete(5)
-tree.pretty_print
-p tree.find(3)
-tree.level_order { |node| puts "#{node.data}\n" }
-array2 = tree.level_order_recursion
-array2.each { |array| puts "#{array[0].data}\n" }
-string = ''
-tree.level_order_recursion { |node| string += node.data.to_s }
-puts string
-
-p tree.inorder
-p tree.preorder
-p tree.postorder
-tree.inorder { |data| puts data }
-
-testarray2 = Array.new(20) { rand(1..100) }
-tree2 = Tree.new(testarray2)
-p tree2.inorder
-tree.pretty_print
-p tree.find(8)
-p tree.height(tree.find(6))
-
-p tree.depth(tree.find(9))
