@@ -3,7 +3,7 @@ class Node
   attr_accessor :left, :right, :data
 
   def <=>(other)
-    @value <=> other.value
+    @value <=> other.data
   end
 
   def initialize(data)

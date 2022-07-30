@@ -75,9 +75,9 @@ class Tree
       current_node = queue[0]
       queue.push(current_node.left) if current_node.left
       queue.push(current_node.right) if current_node.right
-      block_given? ? (yield queue.shift) : array.push(queue.shift)
+      array.push(queue.shift)
     end
-    array
+    block_given? ? array.each { |node| yield node }: array
   end
 
   def level_order_recursion(node = @root, level = 0)
@@ -85,7 +85,7 @@ class Tree
     array += level_order_recursion(node.left, level + 1) if node.left
     array += level_order_recursion(node.right, level + 1) if node.right
     array.sort { |one, two| one[1] <=> two[1] } if level.zero?
-    block_given? ? array.each { |queue| yield queue[0] } : array
+    block_given? ? array.map { |queue| yield queue[0] } : array
   end
 
   def inorder(node = @root, stack = [])
@@ -107,6 +107,28 @@ class Tree
     array = postorder(node.right, array) if node.right
     array.push(node.data)
     block_given? ? (array.each {|data| yield data }) : array
+  end
+
+  def height(node, count = 0)
+    return count if node.left.nil? && node.right.nil?
+
+    return height(node.left, count + 1) if node.right.nil?
+
+    return height(node.right, count + 1) if node.left.nil?
+
+    [height(node.left, count + 1), height(node.right, count + 1)].max
+  end
+
+  def depth(node, count = 0, current_node = @root)
+    return count if current_node == node
+
+    return 0 if current_node.left.nil? && current_node.right.nil?
+
+    return depth(node, count + 1, current_node.left) if current_node.right.nil?
+
+    return depth(node, count + 1, current_node.right) if current_node.left.nil?
+
+    [depth(node, count + 1, current_node.left), depth(node, count + 1, current_node.right)].max
   end
 
   def pretty_print(node = @root, prefix = '', is_left = true)
@@ -136,7 +158,11 @@ p tree.preorder
 p tree.postorder
 tree.inorder { |data| puts data }
 
-testarray2 = Array.new(500) { rand(1..10000) }
+testarray2 = Array.new(20) { rand(1..100) }
 tree2 = Tree.new(testarray2)
 p tree2.inorder
-tree2.pretty_print
+tree.pretty_print
+p tree.find(8)
+p tree.height(tree.find(6))
+
+p tree.depth(tree.find(9))
